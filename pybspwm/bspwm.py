@@ -28,6 +28,17 @@ class BspwmProxy:
         return self.bspwm(*self.command, *command)
 
 
+class BspwmConfigProxy:
+    def __init__(self, bspwm):
+        object.__setattr__(self, "bspwm", bspwm)
+
+    def __getattr__(self, attr):
+        return self.bspwm("config", attr)
+
+    def __setattr__(self, attr, value):
+        self.bspwm("config", attr, value)
+
+
 class Bspwm:
     def __init__(self, socket_path=None):
         if socket_path:
@@ -42,6 +53,10 @@ class Bspwm:
                     + "Passing a value via the socket_path argument is required."
                 )
             self.socket_path = possible_sockets[0]
+
+    @property
+    def config(self):
+        return BspwmConfigProxy(self)
 
     def __getattr__(self, attr):
         return BspwmProxy(self, attr)
