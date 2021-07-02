@@ -13,7 +13,16 @@ class BspwmProxy:
         self.command = command
 
     def __getattr__(self, attr):
-        return BspwmProxy(self.bspwm, *(*self.command, attr))
+        if len(attr) == 1:
+            # Converting to a short CLI flag.
+            attr = "-" + attr
+        if attr and attr[-1] == "_":
+            # Converting to a long CLI flag.
+            attr = "--" + attr[:-1]
+        return self[attr]
+
+    def __getitem__(self, item):
+        return BspwmProxy(self.bspwm, *(*self.command, item))
 
     def __call__(self, *command):
         return self.bspwm(*self.command, *command)
