@@ -3,6 +3,10 @@ from glob import glob
 from os import getenv
 
 
+class BspwmError(Exception):
+    pass
+
+
 class Bspwm:
     def __init__(self, socket_path=None):
         if socket_path:
@@ -23,4 +27,9 @@ class Bspwm:
         s.connect(self.socket_path)
         for word in command:
             s.send(word.encode() + b"\0")
+        response = s.recv(4096)
         s.close()
+        if response and response[0] == 7:
+            raise BspwmError(response[1:-1].decode())
+        else:
+            return response[:-1].decode()
