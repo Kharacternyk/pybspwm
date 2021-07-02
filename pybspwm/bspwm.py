@@ -18,7 +18,7 @@ class BspwmProxy:
             attr = "-" + attr
         if attr and attr[-1] == "_":
             # Converting to a long CLI flag.
-            attr = "--" + attr[:-1]
+            attr = "--" + attr[:-1].replace("_", "-")
         return self[attr]
 
     def __getitem__(self, item):
