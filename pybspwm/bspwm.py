@@ -7,6 +7,18 @@ class BspwmError(Exception):
     pass
 
 
+class BspwmProxy:
+    def __init__(self, bspwm, *command):
+        self.bspwm = bspwm
+        self.command = command
+
+    def __getattr__(self, attr):
+        return BspwmProxy(self.bspwm, *(*self.command, attr))
+
+    def __call__(self, *command):
+        return self.bspwm(*self.command, *command)
+
+
 class Bspwm:
     def __init__(self, socket_path=None):
         if socket_path:
@@ -21,6 +33,9 @@ class Bspwm:
                     + "Passing a value via the socket_path argument is required."
                 )
             self.socket_path = possible_sockets[0]
+
+    def __getattr__(self, attr):
+        return BspwmProxy(self, attr)
 
     def __call__(self, *command):
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
