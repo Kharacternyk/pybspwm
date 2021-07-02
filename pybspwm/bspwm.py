@@ -44,7 +44,8 @@ class Bspwm:
             s.send(word.encode() + b"\0")
         response = s.recv(4096)
         s.close()
-        if response and response[0] == 7:
-            raise BspwmError(response[1:-1].decode())
-        else:
-            return response[:-1].decode()
+        if response:
+            if response[0] == 7:
+                raise BspwmError(response[1:-1].decode())
+            else:
+                return response[:-1].decode()
